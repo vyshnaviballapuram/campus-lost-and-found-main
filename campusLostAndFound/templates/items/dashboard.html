@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Campus Lost & Found{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="display-4 fw-bold mb-3">
+                    Campus Lost & Found Smart Portal
+                </h1>
+                <p class="lead mb-4">
+                    Lost something on campus? Found an item? Our AI-powered platform helps 
+                    connect lost items with their owners through smart matching technology.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{% url 'item_create' %}" class="btn btn-light btn-lg">
+                        <i class="bi bi-plus-circle me-2"></i>Report Item
+                    </a>
+                    <a href="{% url 'item_list' %}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-search me-2"></i>Browse Items
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center mt-4 mt-lg-0">
+                <i class="bi bi-search-heart" style="font-size: 10rem; opacity: 0.8;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Lost Items Stat -->
+            <div class="col-md-4">
+                <div class="card stats-card bg-danger bg-opacity-10 h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-exclamation-triangle text-danger display-5"></i>
+                        <h2 class="stats-number text-danger mt-2">{{ total_lost }}</h2>
+                        <p class="text-muted mb-0">Lost Items</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Found Items Stat -->
+            <div class="col-md-4">
+                <div class="card stats-card bg-success bg-opacity-10 h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-check-circle text-success display-5"></i>
+                        <h2 class="stats-number text-success mt-2">{{ total_found }}</h2>
+                        <p class="text-muted mb-0">Found Items</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Resolved Stat -->
+            <div class="col-md-4">
+                <div class="card stats-card bg-primary bg-opacity-10 h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-heart text-primary display-5"></i>
+                        <h2 class="stats-number text-primary mt-2">{{ total_resolved }}</h2>
+                        <p class="text-muted mb-0">Items Reunited</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Lost Items Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">
+                <i class="bi bi-exclamation-circle text-danger me-2"></i>Recently Lost Items
+            </h3>
+            <a href="{% url 'lost_items' %}" class="btn btn-outline-danger">
+                View All <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        
+        <div class="row g-4">
+            {% for item in recent_lost %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" class="card-img-top item-image" alt="{{ item.title }}">
+                        {% else %}
+                            <div class="card-img-top item-image bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center">
+                                <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-danger status-badge">Lost</span>
+                                <small class="text-muted">{{ item.date_lost_found }}</small>
+                            </div>
+                            <h5 class="card-title">{{ item.title|truncatechars:30 }}</h5>
+                            <p class="card-text text-muted small">
+                                {{ item.description|truncatechars:80 }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-secondary">{{ item.get_category_display }}</span>
+                                <a href="{% url 'item_detail' item.pk %}" class="btn btn-sm btn-outline-primary">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle me-2"></i>
+                        No lost items reported yet.
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Recent Found Items Section -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">
+                <i class="bi bi-check-circle text-success me-2"></i>Recently Found Items
+            </h3>
+            <a href="{% url 'found_items' %}" class="btn btn-outline-success">
+                View All <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        
+        <div class="row g-4">
+            {% for item in recent_found %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" class="card-img-top item-image" alt="{{ item.title }}">
+                        {% else %}
+                            <div class="card-img-top item-image bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center">
+                                <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-success status-badge">Found</span>
+                                <small class="text-muted">{{ item.date_lost_found }}</small>
+                            </div>
+                            <h5 class="card-title">{{ item.title|truncatechars:30 }}</h5>
+                            <p class="card-text text-muted small">
+                                {{ item.description|truncatechars:80 }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-secondary">{{ item.get_category_display }}</span>
+                                <a href="{% url 'item_detail' item.pk %}" class="btn btn-sm btn-outline-primary">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle me-2"></i>
+                        No found items reported yet.
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h3 class="text-center mb-5">How It Works</h3>
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="bi bi-pencil-square text-primary" style="font-size: 2rem;"></i>
+                </div>
+                <h5>1. Report</h5>
+                <p class="text-muted">
+                    Report your lost or found item with detailed description and photos.
+                </p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="bi bi-cpu text-success" style="font-size: 2rem;"></i>
+                </div>
+                <h5>2. Smart Match</h5>
+                <p class="text-muted">
+                    Our AI system automatically finds potential matches using smart algorithms.
+                </p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="rounded-circle bg-warning bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="bi bi-chat-dots text-warning" style="font-size: 2rem;"></i>
+                </div>
+                <h5>3. Connect</h5>
+                <p class="text-muted">
+                    Contact the owner directly and reunite items with their rightful owners.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

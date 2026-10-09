@@ -1,0 +1,8 @@
+# Campus Lost & Found Smart Portal - Dependencies
+# Yeh file sab zaruri Python packages ki list hai
+
+Django>=5.1
+Pillow>=10.0.0
+scikit-learn>=1.3.0
+django-crispy-forms>=2.1
+crispy-bootstrap5>=2024.2

@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}My Items - Campus Lost & Found{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar -->
+    <div class="col-lg-3 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-collection me-2"></i>My Items
+            </div>
+            <div class="card-body">
+                <!-- Stats -->
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Total Items</span>
+                    <span class="badge bg-primary">{{ total_items }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span><i class="bi bi-exclamation-circle text-danger me-1"></i>Lost</span>
+                    <span class="badge bg-danger">{{ lost_count }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span><i class="bi bi-check-circle text-success me-1"></i>Found</span>
+                    <span class="badge bg-success">{{ found_count }}</span>
+                </div>
+                
+                <hr>
+                
+                <!-- Filter Links -->
+                <div class="d-grid gap-2">
+                    <a href="{% url 'my_items' %}" class="btn btn-outline-primary btn-sm {% if not request.GET.status %}active{% endif %}">
+                        All My Items
+                    </a>
+                    <a href="{% url 'my_items' %}?status=lost" class="btn btn-outline-danger btn-sm {% if request.GET.status == 'lost' %}active{% endif %}">
+                        My Lost Items
+                    </a>
+                    <a href="{% url 'my_items' %}?status=found" class="btn btn-outline-success btn-sm {% if request.GET.status == 'found' %}active{% endif %}">
+                        My Found Items
+                    </a>
+                </div>
+                
+                <hr>
+                
+                <!-- Post New Item -->
+                <a href="{% url 'item_create' %}" class="btn btn-primary w-100">
+                    <i class="bi bi-plus-circle me-2"></i>Post New Item
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="col-lg-9">
+        <h2 class="mb-4">
+            <i class="bi bi-collection me-2"></i>My Items
+        </h2>
+        
+        <!-- Items List -->
+        <div class="row g-4">
+            {% for item in items %}
+                <div class="col-md-6">
+                    <div class="card h-100 {% if item.is_resolved %}border-success{% endif %}">
+                        {% if item.is_resolved %}
+                            <div class="position-absolute top-0 end-0 m-2">
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i>Resolved
+                                </span>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="row g-0">
+                            <!-- Item Image -->
+                            <div class="col-4">
+                                {% if item.image %}
+                                    <img src="{{ item.image.url }}" class="img-fluid rounded-start h-100" alt="{{ item.title }}" style="object-fit: cover;">
+                                {% else %}
+                                    <div class="bg-secondary bg-opacity-10 h-100 d-flex align-items-center justify-content-center rounded-start">
+                                        <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Item Details -->
+                            <div class="col-8">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="badge {{ item.status_badge_class }}">
+                                            {{ item.get_status_display }}
+                                        </span>
+                                        <small class="text-muted">{{ item.date_lost_found }}</small>
+                                    </div>
+                                    
+                                    <h6 class="card-title">{{ item.title|truncatechars:30 }}</h6>
+                                    <p class="card-text small text-muted mb-2">
+                                        <i class="bi bi-geo-alt me-1"></i>{{ item.location|truncatechars:25 }}
+                                    </p>
+                                    
+                                    <!-- Action Buttons -->
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'item_detail' item.pk %}" class="btn btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{% url 'item_update' item.pk %}" class="btn btn-outline-secondary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'item_delete' item.pk %}" class="btn btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                        {% if not item.is_resolved %}
+                                            <a href="{% url 'mark_resolved' item.pk %}" class="btn btn-outline-success" title="Mark as Resolved">
+                                                <i class="bi bi-check-lg"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body text-center py-5">
+                            <i class="bi bi-inbox display-1 text-muted"></i>
+                            <h4 class="mt-3">No Items Yet</h4>
+                            <p class="text-muted">
+                                You haven't posted any items yet. Start by reporting a lost or found item.
+                            </p>
+                            <a href="{% url 'item_create' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>Post Your First Item
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
